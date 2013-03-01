@@ -1,0 +1,3 @@
+#!/bin/sh
+
+cut -d',' -f17 [12]*.csv | egrep '(SFO|SMF|OAK)' | sort | uniq -c > originCounts
