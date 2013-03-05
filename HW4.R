@@ -1,6 +1,6 @@
 # Data prep
 
-setw('Data/')
+setw('Data/') # Data must be in a subdirectory named Data
 #system('tar -xjvf Years1987_1999.tar.bz2')
 #system('tar -xjvf Years2000_2008.tar.bz2')
 #system('sqlite 3 air.db < airline.sqlite')
@@ -12,9 +12,9 @@ setw('Data/')
 ##############################################
 
 # Note - the csv files must be in current directory
-Rprof('Rprof1.out')
+
 counts = system("cut -d',' -f17 [12]*.csv | egrep '(LAX|SFO|SMF|OAK)' | sort | uniq -c", intern = T)
-Rprof(NULL)
+
 
 ##############################################
 # Combine shell with R connections to obtain 
@@ -22,9 +22,7 @@ Rprof(NULL)
 # for LAX, OAK, SFO and SMF
 ##############################################
 
-Rprof('Rprof2.out')
 
-con = pipe("egrep '(LAX|OAK|SFO|SMF)' [12]*.csv | cut -d',' -f15,17,18", open = 'r')
 B = 10000;
 apts = c('LAX', 'OAK', 'SFO', 'SMF')
 sum_xi = structure(numeric(4), names = apts)
@@ -55,14 +53,13 @@ close(con)
 avg_delay1 = sum_xi/total
 sd_delay1 = sqrt(sum_xi2/total - avg_delay1^2)
 
-Rprof(NULL)
+
 ##############################################
 # Use connections to obtain mean and standard
 # deviations of delay times for LAX, OAK,
 # SFO and SMF
 ##############################################
 
-Rprof('Rprof3.out')
 
 Sys.setlocale(locale="C") # for strange characters in 2001.csv and 2002.csv
 
@@ -101,14 +98,12 @@ for(i in 1:length(confiles)){
 avg_delay2 = sum_xi/total
 sd_delay2 = sqrt(sum_xi2/total - avg_delay2^2)
 
-Rprof(NULL)
 
 ##############################################
 # Use database queries to get same information
 # as above
 ##############################################
 
-Rprof('Rprof4.out')
 
 library(RSQLite)
 
@@ -131,8 +126,4 @@ sqliteCloseResult(rslt)
 total = nums_origin[,4] + nums_dest[,4]
 avg_delay3 = (nums_origin[,2]*nums_origin[,4] + nums_dest[,2]*nums_dest[,4])/total
 sd_delay3 = sqrt((nums_origin[,3]*nums_origin[,4] + nums_dest[,3]*nums_dest[,4])/total - avg_delay3^2)
-
-Rprof(NULL)
-
-save(counts, avg_delay1, avg_delay2, avg_delay3, sd_delay1, sd_delay2, sd_delay3, file = 'hw4.rda')
 
