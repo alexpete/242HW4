@@ -1,5 +1,6 @@
 # Data prep
 
+setw('Data/')
 #system('tar -xjvf Years1987_1999.tar.bz2')
 #system('tar -xjvf Years2000_2008.tar.bz2')
 #system('sqlite 3 air.db < airline.sqlite')
@@ -34,9 +35,9 @@ temp = readLines(con, n = B)
 
 while(length(temp) > 0){
   
-  temp = strsplit(grep('(LAX|OAK|SFO|SMF|)', temp, value = T), split = ',')
+  temp = strsplit(temp, split = ',')
   data = t(sapply(1:length(temp), function(j){
-    temp[[j]][c(15,17,18)]
+    temp[[j]][1:3]
   }))
   for(i in apts){
     ind = (data[,2] == i | data[,3] == i) & data[, 1] != 'NA'
@@ -49,7 +50,7 @@ while(length(temp) > 0){
 }   
 
 close(con)
-}
+
 
 avg_delay1 = sum_xi/total
 sd_delay1 = sqrt(sum_xi2/total - avg_delay1^2)
@@ -114,7 +115,7 @@ library(RSQLite)
 drv = dbDriver('SQLite')
 con = dbConnect(drv, dbname = 'air.db')
 
-sql.qry = "SELECT Origin, AVG(ArrDelay) AS avg_delay, AVG(ArrDelay*ArrDelay) AS avg_delay_sq, COUNT(*) AS total FROM delays WHERE Origin IN ('LAX', 'OAK', 'SFO', 'SMF') AND NOT ArrDelay = 'NA' GROUP BY Origin"
+sql.qry1 = "SELECT Origin, AVG(ArrDelay) AS avg_delay, AVG(ArrDelay*ArrDelay) AS avg_delay_sq, COUNT(*) AS total FROM delays WHERE Origin IN ('LAX', 'OAK', 'SFO', 'SMF') AND NOT ArrDelay = 'NA' GROUP BY Origin"
 
 rslt = dbSendQuery(con, sql.qry1)
 nums_origin = fetch(rslt, n = -1)
